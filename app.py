@@ -192,13 +192,10 @@ def create_venue_form():
 
 @app.route('/venues/create', methods=['POST'])
 def create_venue_submission():
-  # TODO: insert form data as a new Venue record in the db, instead
-  # TODO: modify data to be the data object returned from db insertion
 
   error = False
 
   try:
-
     name = request.form.get('name')
     city = request.form['city']
     state = request.form['state']
@@ -215,46 +212,59 @@ def create_venue_submission():
 
     db.session.add(new_venue)
     db.session.commit()
-
   except:
     db.session.rollback()
     error = True
     print(sys.exec_info())
-
   finally:
     db.session.close()
 
     if not error:
       flash('Venue ' + request.form['name'] + ' was successfully listed!')
     else:
-      flash('An error occurred. Venue ' + data.name + ' could not be listed.')
+      flash('An error occurred. Venue ' + request.form['name'] + ' could not be listed.')
 
   return render_template('pages/home.html')
 
 @app.route('/venues/<venue_id>', methods=['DELETE'])
 def delete_venue(venue_id):
-  # TODO: Complete this endpoint for taking a venue_id, and using
-  # SQLAlchemy ORM to delete a record. Handle cases where the session commit could fail.
+  error = False
 
-  # BONUS CHALLENGE: Implement a button to delete a Venue on a Venue Page, have it so that
-  # clicking that button delete it from the db then redirect the user to the homepage
+  try:
+    tobe_del_venue = Venue.query.get(venue_id)
+    db.session.delete(tobe_del_venue)
+    db.session.commit()
+  except:
+    db.session.rollback()
+    error = True
+    print(sys.exc_info())
+  finally:
+    db.session.close()
+
+    if not error:
+      flash(f'Venue {venue_id} was deleted successfully!')
+      return redirect(url_for('index'))
+    else:
+      flash(f'An error occurred! Venue {venue_id} could not be deleted.')
+
   return None
 
 #  Artists
 #  ----------------------------------------------------------------
 @app.route('/artists')
 def artists():
-  # TODO: replace with real data returned from querying the database
-  data=[{
-    "id": 4,
-    "name": "Guns N Petals",
-  }, {
-    "id": 5,
-    "name": "Matt Quevedo",
-  }, {
-    "id": 6,
-    "name": "The Wild Sax Band",
-  }]
+
+  data = []
+
+  artists = db.session.query(Artist).with_entities(Artist.id, Artist.name).all()
+
+  for artist in artists:
+
+    data.append({
+      "id": artist.id,
+      "name": artist.name
+    })
+
   return render_template('pages/artists.html', artists=data)
 
 @app.route('/artists/search', methods=['POST'])
