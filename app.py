@@ -5,6 +5,7 @@
 import json
 import dateutil.parser
 import babel
+import sys
 from flask import Flask, render_template, request, Response, flash, redirect, url_for
 from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
@@ -131,7 +132,7 @@ def show_venue(venue_id):
 
   venue = db.session.query(Venue).get(venue_id)
 
-  if len(venue) == 0:
+  if not venue:
     return render_template('errors/404.html')
 
   past_show_results = db.session.query(Show).filter(Show.venue_id == venue_id).filter(Show.start_time < datetime.now()).all()
@@ -193,11 +194,40 @@ def create_venue_submission():
   # TODO: insert form data as a new Venue record in the db, instead
   # TODO: modify data to be the data object returned from db insertion
 
-  # on successful db insert, flash success
-  flash('Venue ' + request.form['name'] + ' was successfully listed!')
-  # TODO: on unsuccessful db insert, flash an error instead.
-  # e.g., flash('An error occurred. Venue ' + data.name + ' could not be listed.')
-  # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
+  error = False
+
+  try:
+
+    name = request.form.get('name')
+    city = request.form['city']
+    state = request.form['state']
+    address = request.form['address']
+    phone = request.form['phone']
+    genres = request.form.getlist('genres')
+    website = request.form['website']
+    image_link = request.form['image_link']
+    facebook_link = request.form['facebook_link']
+    seeking_talent = True if 'seeking_talent' in request.form else False
+    seeking_description = request.form['seeking_description']
+
+    new_venue = Venue(name=name, city=city, state=state, address=address, phone=phone, genres=genres,  website=website, image_link=image_link, facebook_link=facebook_link, seeking_talent=seeking_talent, seeking_description=seeking_description)
+
+    db.session.add(new_venue)
+    db.session.commit()
+
+  except:
+    db.session.rollback()
+    error = True
+    print(sys.exec_info())
+
+  finally:
+    db.session.close()
+
+    if not error:
+      flash('Venue ' + request.form['name'] + ' was successfully listed!')
+    else:
+      flash('An error occurred. Venue ' + data.name + ' could not be listed.')
+
   return render_template('pages/home.html')
 
 @app.route('/venues/<venue_id>', methods=['DELETE'])
