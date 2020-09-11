@@ -104,7 +104,19 @@ def search_venues():
 
   search_term = request.form.get('search_term', '')
 
-  venue_result_set = Venue.query.filter(func.lower(Venue.name).like(func.lower("%" + search_term + "%"))).all()
+  if ',' in search_term:
+
+    sep_loc = search_term.find(',')
+
+    city = search_term[0:sep_loc].strip()
+
+    state = search_term[sep_loc + 1:].strip()
+
+    venue_result_set = Venue.query.filter(Venue.city.ilike("%" + city + "%")).filter(Venue.state.ilike("%" + state + "%")).all()
+
+  else:
+
+    venue_result_set = Venue.query.filter(func.lower(Venue.name).like(func.lower("%" + search_term + "%"))).all()
 
   num_matches = len(venue_result_set)
 
@@ -285,7 +297,19 @@ def search_artists():
 
   search_term = request.form.get('search_term','')
 
-  artists = Artist.query.filter(func.lower(Artist.name).like(func.lower("%" + search_term + "%"))).all()
+  if ',' in search_term:
+
+    sep_loc = search_term.find(',')
+
+    city = search_term[0:sep_loc].strip()
+
+    state = search_term[sep_loc + 1:].strip()
+
+    artists = Artist.query.filter(Artist.city.ilike("%" + city + "%")).filter(Artist.state.ilike("%" + state + "%")).all()
+
+  else:
+
+    artists = Artist.query.filter(func.lower(Artist.name).like(func.lower("%" + search_term + "%"))).all()
 
   data = []
 
