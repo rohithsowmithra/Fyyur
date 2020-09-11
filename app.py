@@ -9,7 +9,7 @@ import sys
 from flask import Flask, render_template, request, Response, flash, redirect, url_for
 from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import func
+from sqlalchemy import func,desc
 from flask_migrate import Migrate
 import logging
 from logging import Formatter, FileHandler
@@ -56,7 +56,9 @@ app.jinja_env.filters['datetime'] = format_datetime
 
 @app.route('/')
 def index():
-  return render_template('pages/home.html')
+  artists = Artist.query.with_entities(Artist.id,Artist.name).order_by(desc(Artist.created_at)).limit(10).all()
+  venues = Venue.query.with_entities(Venue.id, Venue.name).order_by(desc(Venue.created_at)).limit(10).all()
+  return render_template('pages/home.html', artists=artists, venues=venues)
 
 
 #  Venues
