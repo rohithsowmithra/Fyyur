@@ -5,8 +5,6 @@ Fyyur
 
 Fyyur is a musical venue and artist booking site that facilitates the discovery and bookings of shows between local performing artists and venues. This site lets you list new artists and venues, discover them, and list shows with artists as a venue owner.
 
-Your job is to build out the data models to power the API endpoints for the Fyyur site by connecting to a PostgreSQL database for storing, querying, and creating information about artists and venues on Fyyur.
-
 
 ### Tech Stack
 
@@ -23,9 +21,9 @@ Your job is to build out the data models to power the API endpoints for the Fyyu
   ├── app.py *** the main driver of the app. Includes your SQLAlchemy models.
                     "python app.py" to run after installing dependences
   ├── config.py *** Database URLs, CSRF generation, etc
-  ├── models.py ***
-  ├── error.log
-  ├── forms.py *** Your forms
+  ├── models.py *** has models for the application
+  ├── error.log *** htmls for HTTP 404 & 500
+  ├── forms.py 	*** html forms required for the website
   ├── requirements.txt *** The dependencies we need to install with "pip3 install -r requirements.txt"
   ├── static
   │   ├── css 
